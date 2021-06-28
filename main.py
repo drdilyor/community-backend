@@ -70,6 +70,7 @@ async def handle_response(res):
         if res.headers['Content-Type'] and res.headers['Content-Type'].startswith('application/json'):
             return JSONResponse(status_code=res.status, content=await res.json())
         else:
+            print(res.headers['Content-Type'])
             print(await res.read())
             return JSONResponse(status_code=res.status)
 
@@ -99,21 +100,29 @@ async def do_request(method, url, token, json=None):
 # test and define.
 
 @app.get('/{url:path}')
-async def api_get(url: str, x_token: str = Header(...)):
+async def api_get(request: Request, url: str, x_token: str = Header(...)):
     url = validate_url(url)
+    if request.query_params:
+        url += '?' + str(request.query_params)
     return await handle_response(await do_request('get', url, x_token))
 
 @app.post('/{url:path}')
 async def api_post(request: Request, url: str, body: Optional[Any] = Body(None), x_token: str = Header(...)):
     url = validate_url(url)
+    if request.query_params:
+        url += '?' + str(request.query_params)
     return await handle_response(await do_request('post', url, x_token, body))
 
 @app.put('/{url:path}')
 async def api_put(request: Request, url: str, x_token: str = Header(...)):
     url = validate_url(url)
+    if request.query_params:
+        url += '?' + str(request.query_params)
     return await handle_response(await do_request('put', url, x_token, body))
 
 @app.delete('/{url:path}')
 async def api_delete(request: Request, url: str, body: Optional[Any] = Body(None), x_token: str = Header(...)):
     url = validate_url(url)
+    if request.query_params:
+        url += '?' + str(request.query_params)
     return await handle_response(await do_request('delete', url, x_token, body))
