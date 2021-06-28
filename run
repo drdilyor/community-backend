@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+import os
+import uvicorn
+
+uvicorn.run('main:app', port=os.environ.get('PORT', 34502))
