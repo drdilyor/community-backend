@@ -21,9 +21,7 @@ app = FastAPI()
 base_url = 'https://community.uzbekcoders.uz/api/v1'
 noop_jar = aiohttp.DummyCookieJar()
 client = aiohttp.ClientSession(cookie_jar=noop_jar)
-origins = [
-    'http://localhost:34501',
-]
+origins = '*'
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -76,7 +74,7 @@ async def handle_response(res):
 
 async def do_request(method, url, token, json=None):
     print(json)
-    cookies = decode_token(token)
+    cookies = decode_token(token) if token else {}
     headers = {}
     if method != 'get':
         # obtain csrf
@@ -100,7 +98,7 @@ async def do_request(method, url, token, json=None):
 # test and define.
 
 @app.get('/{url:path}')
-async def api_get(request: Request, url: str, x_token: str = Header(...)):
+async def api_get(request: Request, url: str, x_token: str = Header(None)):
     url = validate_url(url)
     if request.query_params:
         url += '?' + str(request.query_params)
